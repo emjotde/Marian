@@ -427,7 +427,7 @@ Expr affine(Expr a, Expr b, Expr bias, bool transA, bool transB, float scale) {
       // start with new set of algorithms
       tuner->clear();
 
-      // lower precicion for shapes, reduces data sparsity
+      // lower precision for shapes, reduces data sparsity
       auto sh = [](Shape sh) {
         for(size_t i = 0; i < sh.size(); ++i)
           sh.set(i, sh[i] / 4);
@@ -729,7 +729,7 @@ Expr highway(Expr y, Expr x, Expr t) {
   return Expression<HighwayNodeOp>(nodes);
 }
 
-Expr highway(const std::string prefix, Expr x) {
+Expr highway(const std::string& prefix, Expr x) {
   // clang-format off
   size_t outDim = x->shape()[-1];
   auto graph = x->graph();

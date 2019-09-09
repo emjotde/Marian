@@ -113,7 +113,7 @@ private:
   }
 
 public:
-  TemporaryFile(const std::string base = "/tmp/", bool earlyUnlink = true)
+  TemporaryFile(const std::string& base = "/tmp/", bool earlyUnlink = true)
       : unlink_(earlyUnlink) {
     std::string baseTemp(base);
     NormalizeTempPrefix(baseTemp);

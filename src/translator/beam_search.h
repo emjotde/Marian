@@ -157,7 +157,7 @@ public:
   }
 
   std::vector<float> getAlignmentsForHypothesis( // -> P(s|t) for current t and given beam and batch dim
-      const std::vector<float> alignAll, // [beam depth, max src length, batch size, 1], flattened
+      const std::vector<float>& alignAll, // [beam depth, max src length, batch size, 1], flattened
       Ptr<data::CorpusBatch> batch,
       int beamHypIdx,
       int batchIdx) const {

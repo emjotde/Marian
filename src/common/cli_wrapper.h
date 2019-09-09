@@ -27,7 +27,7 @@ enum struct OptionPriority : int { DefaultValue = 0, ConfigFile = 1, CommandLine
  * Removing it would require deep modifications in the 3rd party library, what we want to avoid.
  */
 struct CLIOptionTuple {
-  CLI::Option *opt;     // a pointer to an option object from CLI11
+  CLI::Option* opt;     // a pointer to an option object from CLI11
   Ptr<any_type> var;    // value assigned to the option via command-line
   size_t idx{0};        // order in which the option was created
   OptionPriority priority{cli::OptionPriority::DefaultValue};
@@ -44,7 +44,7 @@ struct CLIAliasTuple {
 class CLIFormatter : public CLI::Formatter {
 public:
   CLIFormatter(size_t columnWidth, size_t screenWidth);
-  virtual std::string make_option_desc(const CLI::Option *) const override;
+  virtual std::string make_option_desc(const CLI::Option*) const override;
 
 private:
   size_t screenWidth_{0};
@@ -77,27 +77,22 @@ private:
   std::string defaultGroup_{""};        // Name of the default option group
   std::string currentGroup_{""};        // Name of the current option group
 
-  YAML::Node &config_;                  // Reference to the main config object
+  YAML::Node& config_;                  // Reference to the main config object
 
   // Option for --version flag. This is a special flag and similarly to --help,
   // the key "version" will be not added into the YAML config
-  CLI::Option *optVersion_;
+  CLI::Option* optVersion_;
 
   // Extract option name from a comma-separated list of long and short options, e.g. 'help' from
   // '--help,-h'
-  std::string keyName(const std::string &args) const {
-    // re-use existing functions from CLI11 to keep option names consistent
-    return std::get<1>(
-               CLI::detail::get_names(CLI::detail::split_names(args)))  // get long names only
-        .front();                                                       // get first long name
-  }
+  std::string keyName(const std::string& args) const;
 
   // Get names of options passed via command-line
   std::unordered_set<std::string> getParsedOptionNames() const;
   // Get option names in the same order as they are created
   std::vector<std::string> getOrderedOptionNames() const;
 
-  static std::string failureMessage(const CLI::App *app, const CLI::Error &e);
+  static std::string failureMessage(const CLI::App* app, const CLI::Error& e);
 
 public:
   /**
@@ -112,10 +107,10 @@ public:
    * @param columnWidth Width of the column with option names
    * @param screenWidth Maximum allowed width for help messages, 0 means no limit
    */
-  CLIWrapper(YAML::Node &config,
-             const std::string &description = "",
-             const std::string &header = "General options",
-             const std::string &footer = "",
+  CLIWrapper(YAML::Node& config,
+             const std::string& description = "",
+             const std::string& header = "General options",
+             const std::string& footer = "",
              size_t columnWidth = 40,
              size_t screenWidth = 0);
 
@@ -125,9 +120,9 @@ public:
    * @see Other constructor
    */
   CLIWrapper(Ptr<Options> options,
-             const std::string &description = "",
-             const std::string &header = "General options",
-             const std::string &footer = "",
+             const std::string& description = "",
+             const std::string& header = "General options",
+             const std::string& footer = "",
              size_t columnWidth = 30,
              size_t screenWidth = 0);
 
@@ -145,7 +140,7 @@ public:
    * @return Option object
    */
   template <typename T>
-  CLI::Option *add(const std::string &args, const std::string &help, T val) {
+  CLI::Option* add(const std::string& args, const std::string& help, T val) {
     return addOption<T>(keyName(args),
                         args,
                         help,
@@ -170,7 +165,7 @@ public:
    * @TODO: require to always state the default value creating the parser as this will be clearer
    */
   template <typename T>
-  CLI::Option *add(const std::string &args, const std::string &help) {
+  CLI::Option* add(const std::string& args, const std::string& help) {
     return addOption<T>(keyName(args),
                         args,
                         help,
@@ -198,9 +193,9 @@ public:
    * @param value Option value that trigger the alias
    * @param fun Function setting a temporary YAML config with options expanded by alias
    */
-  void alias(const std::string &key,
-             const std::string &value,
-             const std::function<void(YAML::Node &config)> &fun) {
+  void alias(const std::string& key,
+             const std::string& value,
+             const std::function<void(YAML::Node& config)>& fun) {
     ABORT_IF(!options_.count(key), "Option '{}' is not defined so alias can not be created", key);
     aliases_.resize(aliases_.size() + 1);
     aliases_.back().key = key;
@@ -213,10 +208,10 @@ public:
    *
    * @param name Header of the option group
    */
-  void switchGroup(const std::string &name = "");
+  void switchGroup(const std::string& name = "");
 
   // Parse command-line arguments. Handles --help and --version options
-  void parse(int argc, char **argv);
+  void parse(int argc, char** argv);
 
   /**
    * @brief Expand aliases based on arguments parsed with parse(int, char**)
@@ -244,19 +239,20 @@ public:
    * @param errorMsg error message printed if config contains undefined keys. The message is
    *   appended with ": <comma-separated list of invalid options>"
    */
-  void updateConfig(const YAML::Node &config, cli::OptionPriority priority, const std::string &errorMsg);
+  void updateConfig(const YAML::Node& config, cli::OptionPriority priority, const std::string& errorMsg);
 
   // Get textual YAML representation of the config
   std::string dumpConfig(bool skipUnmodified = false) const;
 
 private:
-  template <typename T,
-            // options with numeric and string-like values
-            CLI::enable_if_t<!CLI::is_bool<T>::value && !CLI::is_vector<T>::value,
-                             CLI::detail::enabler> = CLI::detail::dummy>
-  CLI::Option *addOption(const std::string &key,
-                         const std::string &args,
-                         const std::string &help,
+  template <typename T>
+  using EnableIfNumbericOrString = CLI::enable_if_t<!CLI::is_bool<T>::value
+                                   && !CLI::is_vector<T>::value, CLI::detail::enabler>;
+
+  template <typename T, EnableIfNumbericOrString<T> = CLI::detail::dummy>
+  CLI::Option* addOption(const std::string& key,
+                         const std::string& args,
+                         const std::string& help,
                          T val,
                          bool defaulted) {
     // add key to YAML
@@ -271,7 +267,7 @@ private:
     CLI::callback_t fun = [this, key](CLI::results_t res) {
       options_[key].priority = cli::OptionPriority::CommandLine;
       // get variable associated with the option
-      auto &var = options_[key].var->as<T>();
+      auto& var = options_[key].var->as<T>();
       // store parser result in var
       auto ret = CLI::detail::lexical_cast(res[0], var);
       // update YAML entry
@@ -298,12 +294,13 @@ private:
     return options_[key].opt;
   }
 
-  template <typename T,
-            // options with vector values
-            CLI::enable_if_t<CLI::is_vector<T>::value, CLI::detail::enabler> = CLI::detail::dummy>
-  CLI::Option *addOption(const std::string &key,
-                         const std::string &args,
-                         const std::string &help,
+  template <typename T>
+  using EnableIfVector = CLI::enable_if_t<CLI::is_vector<T>::value, CLI::detail::enabler>;
+
+  template <typename T, EnableIfVector<T> = CLI::detail::dummy>
+  CLI::Option* addOption(const std::string& key,
+                         const std::string& args,
+                         const std::string& help,
                          T val,
                          bool defaulted) {
     // add key to YAML
@@ -318,7 +315,7 @@ private:
     CLI::callback_t fun = [this, key](CLI::results_t res) {
       options_[key].priority = cli::OptionPriority::CommandLine;
       // get vector variable associated with the option
-      auto &vec = options_[key].var->as<T>();
+      auto& vec = options_[key].var->as<T>();
       vec.clear();
       bool ret = true;
       // handle '[]' as an empty vector
@@ -326,7 +323,7 @@ private:
         ret = true;
       } else {
         // populate the vector with parser results
-        for(const auto &a : res) {
+        for(const auto& a : res) {
           vec.emplace_back();
           ret &= CLI::detail::lexical_cast(a, vec.back());
         }
@@ -355,12 +352,13 @@ private:
     return options_[key].opt;
   }
 
-  template <typename T,
-            // options with boolean values, called flags in CLI11
-            CLI::enable_if_t<CLI::is_bool<T>::value, CLI::detail::enabler> = CLI::detail::dummy>
-  CLI::Option *addOption(const std::string &key,
-                         const std::string &args,
-                         const std::string &help,
+  template <typename T>
+  using EnableIfBoolean = CLI::enable_if_t<CLI::is_bool<T>::value, CLI::detail::enabler>;
+
+  template <typename T, EnableIfBoolean<T> = CLI::detail::dummy>
+  CLI::Option* addOption(const std::string& key,
+                         const std::string& args,
+                         const std::string& help,
                          T val,
                          bool defaulted) {
     // add key to YAML

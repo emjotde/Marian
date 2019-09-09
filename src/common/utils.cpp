@@ -352,7 +352,7 @@ std::string findReplace(const std::string& in, const std::string& what, const st
   return res;
 }
 
-double parseDouble(std::string s) {
+double parseDouble(const std::string& s) {
   double res;
   char c;  // dummy char -- if we succeed to parse this, then there were extraneous characters after the number
   auto rc = sscanf(s.c_str(), "%lf%c", &res, &c);
@@ -378,6 +378,10 @@ double parseNumber(std::string param) {
   // the right place)
   std::remove_if(param.begin(), param.end(), [](char c) { return c == ','; });
   return factor * parseDouble(param);
+}
+
+size_t roundUp(size_t value, size_t factor) {
+  return (value + factor - 1) / factor * factor;
 }
 
 }  // namespace utils

@@ -10,6 +10,7 @@
 
 #include "common/definitions.h"
 #include "common/types.h"
+#include "common/utils.h"
 #include "tensors/device.h"
 #include "tensors/memory_piece.h"
 
@@ -91,7 +92,7 @@ private:
   std::unordered_map<uint8_t*, Ptr<MemoryPiece>> allocated_;
 
   size_t align(size_t size) {
-    return (size_t)(ceil(size / (float)alignment_) * alignment_);
+    return utils::roundUp(size, alignment_);
   }
 
   void grow(size_t add) {
@@ -228,7 +229,7 @@ public:
     auto it = allocated_.find(ptr);
     if(it != allocated_.end()) {
       allocated_.erase(ptr);
-      insertGap(Gap(ptr, bytes), true);
+      insertGap(Gap(ptr, bytes));
       return true;
     }
     return false;

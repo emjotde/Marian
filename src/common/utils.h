@@ -51,8 +51,13 @@ bool isContinuousScript(char32_t c);
 
 std::string findReplace(const std::string& in, const std::string& what, const std::string& withWhat, bool all = false);
 
-double parseDouble(std::string s);
+double parseDouble(const std::string& s);
 double parseNumber(std::string s);
+
+/**
+ * Return the lowest integer number greater than 'value' and divided by 'factor'.
+ */
+size_t roundUp(size_t value, size_t factor);
 
 }  // namespace utils
 }  // namespace marian

@@ -2,12 +2,13 @@
 
 #include "common/definitions.h"
 #include "common/options.h"
+#include "common/utils.h"
 #include "data/batch_generator.h"
 #include "graph/expression_graph.h"
 #include "models/model_base.h"
 #include "optimizers/optimizers.h"
-#include "training/scheduler.h"
 #include "training/communicator.h"
+#include "training/scheduler.h"
 
 namespace marian {
 
@@ -47,7 +48,7 @@ public:
   /**
    * Determine maximal batch size that can fit into the given workspace
    * so that reallocation does not happen. Rather adjust the batch size
-   * based on the stastistics collected here. Activated with
+   * based on the statistics collected here. Activated with
    * `--mini-batch-fit`.
    * In a multi-GPU scenario, the first GPU is used to determine the size.
    * The actual allowed size is then determined by multiplying it with the
@@ -69,7 +70,7 @@ public:
     size_t step = options_->get<size_t>("mini-batch-fit-step");
 
     size_t maxLength = options_->get<size_t>("max-length");
-    maxLength = (size_t)(std::ceil(maxLength / (float)step) * step);
+    maxLength = utils::roundUp(maxLength, step);
 
     // this should be only one class label per line on input, hence restricting length to 1
     std::vector<size_t> localMaxes(numFiles, maxLength);
@@ -92,7 +93,7 @@ public:
         maxBatch *= 2;
     }
 
-    // Do a binary search for maxmimum batch size that fits into given workspace memory 
+    // Do a binary search for maximum batch size that fits into given workspace memory 
     // for a tested sentence length. 
     for(size_t i = step; i <= maxLength; i += step) {
       size_t start = 1;

@@ -77,7 +77,7 @@ public:
 
 typedef Accumulator<EncoderClassifierFactory> encoder_classifier;
 
-Ptr<IModel> createBaseModelByType(std::string type, usage, Ptr<Options> options);
+Ptr<IModel> createBaseModelByType(const std::string& type, usage, Ptr<Options> options);
 
 Ptr<IModel> createModelFromOptions(Ptr<Options> options, usage);
 

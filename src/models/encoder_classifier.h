@@ -14,7 +14,7 @@ namespace marian {
  * Can be used to train sequence classifiers like language detection, BERT-next-sentence-prediction etc.
  * Already has support for multi-objective training.
  *
- * @TODO: this should probably be unified somehow with EncoderDecoder which could allow for deocder/classifier
+ * @TODO: this should probably be unified somehow with EncoderDecoder which could allow for decoder/classifier
  * multi-objective training.
  */
 class EncoderClassifierBase : public models::IModel {
@@ -186,7 +186,7 @@ public:
   }
 
   template <typename T>
-  void set(std::string key, T value) {
+  void set(const std::string& key, T value) {
     options_->set(key, value);
   }
 
